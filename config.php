@@ -49,15 +49,12 @@ if ($op == 'edit') {
     $kategori = $r1['kategori'];
     $keterangan = $r1['keterangan'];
 
-    // if($r1['pemasukan']==0){
-    //     $jumlah = $r1['pengeluaran'];
-    //     $tipe = "pengeluaran";
-    // }
-
-    // else{
-    //     $jumlah = $r1['pemasukan'];
-    //     $tipe = "pemasukan";
-    // }
+    $jumlah = $r1['pemasukan'] + $r1['pengeluaran'];
+    if ($r1['pemasukan'] > 0) {
+        $tipe = "pemasukan";
+    } else {
+        $tipe = "pengeluaran";
+    }
 
     if ('kategori' == '') {
         $error = "Data tidak ditemukan";
