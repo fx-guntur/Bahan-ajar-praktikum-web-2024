@@ -10,7 +10,7 @@ if (!$conn) {
     die("Tidak bisa terkoneksi ke database");
 }
 
-if(!@$_SESSION) {
+if (!@$_SESSION) {
     session_start();
 }
 
@@ -48,15 +48,15 @@ if ($op == 'edit') {
     $kategori = $r1['kategori'];
     $keterangan = $r1['keterangan'];
 
-    // if($r1['pemasukan']==0){
-    //     $jumlah = $r1['pengeluaran'];
-    //     $tipe = "pengeluaran";
-    // }
+    if($r1['pemasukan']==0){
+        $jumlah = $r1['pengeluaran'];
+        $tipe = "pengeluaran";
+    }
 
-    // else{
-    //     $jumlah = $r1['pemasukan'];
-    //     $tipe = "pemasukan";
-    // }
+    else{
+        $jumlah = $r1['pemasukan'];
+        $tipe = "pemasukan";
+    }
 
     if ('kategori' == '') {
         $error = "Data tidak ditemukan";
@@ -68,19 +68,20 @@ if (isset($_POST['simpan'])) {
     $keterangan = $_POST['keterangan'];
     $jumlah = $_POST['jumlah'];
     $tipe = $_POST['tipe'];
+    if ($tipe == "pemasukan") {
+        $pemasukan = $jumlah;
+        $pengeluaran = 0;
+    } else {
+        $pengeluaran = $jumlah;
+        $pemasukan = 0;
+    }
 
     if ($kategori && $keterangan && $tipe && $jumlah) {
         if ($op == 'edit') {
             $sql1 = "SELECT * FROM tabel_keuangan where id = '$id_transaksi'";
             $q1 = mysqli_query($conn, $sql1);
             $r1 = mysqli_fetch_array($q1);
-            if ($tipe == "pemasukan") {
-                $pemasukan = $jumlah;
-                $pengeluaran = $r1['pengeluaran'];
-            } else {
-                $pengeluaran = $jumlah;
-                $pemasukan = $r1['pemasukan'];
-            }
+            
             $sql2 = "UPDATE tabel_keuangan SET kategori = '$kategori', keterangan = '$keterangan', pemasukan = '$pemasukan',  pengeluaran = '$pengeluaran' WHERE id = '$id_transaksi'";
             $q2 = mysqli_query($conn, $sql2);
             if ($q2) {
@@ -89,16 +90,15 @@ if (isset($_POST['simpan'])) {
                 $error = "Data gagal diupdate";
             }
         } else {
-            if ($tipe == "pemasukan") {
-                $pemasukan = $jumlah;
-                $pengeluaran = 0;
-            } else {
-                $pengeluaran = $jumlah;
-                $pemasukan = 0;
+            $stmt = mysqli_prepare($conn, "INSERT INTO tabel_keuangan(kategori, pemasukan, pengeluaran, keterangan, id_akun) VALUES (?, ?, ?, ?, ?)");
+            if ($stmt === false) {
+                die("Persiapan pernyataan gagal: " . mysqli_error($conn));
             }
-            $sqli = "INSERT INTO tabel_keuangan(kategori, pemasukan, pengeluaran, keterangan) VALUES('$kategori','$pemasukan','$pengeluaran', '$keterangan')";
-            $q1 = mysqli_query($conn, $sqli);
-            if ($q1) {
+
+            mysqli_stmt_bind_param($stmt, "siisi", $kategori, $pemasukan, $pengeluaran, $keterangan, $_SESSION['id']);
+            $sql_result = mysqli_stmt_execute($stmt);
+
+            if ($sql_result) {
                 $sukses = "Berhasil memasukkan data baru";
             } else {
                 $error = "Gagal memasukkan data";

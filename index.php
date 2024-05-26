@@ -100,7 +100,21 @@ if(!$_SESSION["login"]) {
         <!-- untuk menampilkan data -->
         <div class="card">
             <div class="card-header text-white bg-secondary">
-                Data Keuangan Bulan ini
+                Data Keuangan <?php 
+                    $stmt = mysqli_prepare($conn, "SELECT username FROM user WHERE id = ?");
+                    if ($stmt === false) {
+                        die("Persiapan pernyataan gagal: " . mysqli_error($conn));
+                    }
+
+                    mysqli_stmt_bind_param($stmt, "i", $_SESSION['id']);
+                    mysqli_stmt_execute($stmt);
+                    $result = mysqli_stmt_get_result($stmt);
+
+                    if (mysqli_num_rows($result) > 0) {
+                        $r = mysqli_fetch_array($result);
+                        echo ucfirst($r['username']);
+                    }
+                ?> Bulan ini
             </div>
             <div class="card-body">
                 <table class="table">

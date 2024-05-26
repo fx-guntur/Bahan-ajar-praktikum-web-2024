@@ -32,7 +32,7 @@ CREATE TABLE IF NOT EXISTS `tabel_keuangan` (
   CONSTRAINT `FK_tabel_keuangan_user` FOREIGN KEY (`id_akun`) REFERENCES `user` (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
--- Dumping data for table manajemen_keuangan.tabel_keuangan: ~3 rows (approximately)
+-- Dumping data for table manajemen_keuangan.tabel_keuangan: ~2 rows (approximately)
 DELETE FROM `tabel_keuangan`;
 INSERT INTO `tabel_keuangan` (`id`, `kategori`, `keterangan`, `pemasukan`, `pengeluaran`, `id_akun`) VALUES
 	(2, 'Bisnis Kopi', 'penjualan hari pertama', 200000, 150000, 1),
