@@ -57,10 +57,6 @@ if ($op == 'edit') {
         $jumlah = $r1['pemasukan'];
         $tipe = "pemasukan";
     }
-
-    if ('kategori' == '') {
-        $error = "Data tidak ditemukan";
-    }
 }
 
 if (isset($_POST['simpan'])) {
