@@ -1,0 +1,90 @@
+/* Form */
+.input-group {
+    position: relative;
+    margin-top: 1.5rem;
+    margin-bottom: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+}
+
+.input-group label {
+    font-family: "Poppins", sans-serif;
+}
+
+.input-group input {
+    padding: 1rem 1.5rem;
+    height: 3.5rem;
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+    border-radius: 0.8rem;
+    box-sizing: border-box;
+    border: 1px solid hsl(var(--background-foreground));
+    outline: none;
+    background-color: transparent;
+    transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-duration: 150ms;
+}
+
+.input-group input:focus {
+    border: 1px solid hsl(var(--primary));
+}
+
+.input-group input::placeholder {
+    color: hsl(var(--background-foreground));
+}
+
+.input-group input.placeholder-primary {
+    color: hsl(var(--white))
+}
+
+.input-group input.placeholder-primary:focus {
+    border: 1px solid hsl(var(--white));
+}
+
+.input-group input.placeholder-primary::placeholder {
+    color: hsla(var(--white), 0.5);
+}
+
+.input-group.border-primary input {
+    border: 1px solid hsla(var(--white), 0.5);
+}
+
+.btn-secondary {
+    background-color: hsl(var(--secondary));
+    width: 100%;
+    height: 3.5rem;
+    color: hsl(var(--secondary-foreground));
+    font-weight: 700;
+    font-size: 14px;
+    border-radius: 0.8rem;
+    cursor: pointer;
+  }
+  
+  .btn-secondary:hover {
+    background-color: hsla(var(--secondary), 0.8);
+    box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  }
+
+  .link {
+    color: hsl(var(--primary-foreground));
+  }
+  
+  .link-primary {
+    color: hsl(var(--primary));
+  }
+  
+  .link,
+  .link-primary {
+    text-decoration: underline;
+  }
+  
+  .link:hover,
+  .link-primary:hover {
+    text-decoration: none;
+  }
+  
+  .text-center {
+    text-align: center;
+  }
