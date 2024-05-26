@@ -1,5 +1,9 @@
 <?php
 include 'config.php';
+
+if(isset($_SESSION['login'])) {
+  header('Location: index.php');
+}
 ?>
 
 <!DOCTYPE html>
@@ -52,7 +56,7 @@ include 'config.php';
           <input type="password" class="placeholder-primary" id="password-confirmation" name="password-confirmation" placeholder="Your password confirmation">
         </div>
         <button type="submit" name="register" class="btn-secondary btn-submit">Sign Up</button>
-        <p class="text-center">Already have an account? <a href="signin.html" class="link">Sign In</a></p>
+        <p class="text-center">Already have an account? <a href="signin.php" class="link">Sign In</a></p>
       </form>
     </section>
   </main>

@@ -1,5 +1,13 @@
 <?php
 include 'config.php';
+
+if(!$_SESSION["login"]) {
+    header("refresh:0;url=signin.php");
+    echo "<script>
+        alert('Harus login terlebih dahulu')
+    </script>";
+    exit();
+}
 ?>
 
 <!DOCTYPE html>
@@ -98,54 +106,72 @@ include 'config.php';
                 <table class="table">
                     <thead>
                         <tr>
-                            <th scope="col">ID</th>
+                            <th scope="col">Nomor</th>
                             <th scope="col">Kategori</th>
                             <th scope="col">Keterangan</th>
                             <th scope="col">Pemasukan</th>
                             <th scope="col">Pengeluaran</th>
                             <th scope="col">Aksi</th>
                         </tr>
+                    </thead>
                     <tbody>
                         <?php
-                        $sql2 = "SELECT * FROM tabel_keuangan ORDER BY id ASC";
-                        $q2 = mysqli_query($conn, $sql2);
-                        while ($r2 = mysqli_fetch_array($q2)) {
-                            $id_transaksi = $r2['id'];
-                            $kategori = $r2['kategori'];
-                            $keterangan = $r2['keterangan'];
-                            $pemasukan = $r2['pemasukan'];
-                            $pengeluaran = $r2['pengeluaran'];
+                            $stmt = mysqli_prepare($conn, "SELECT * FROM tabel_keuangan WHERE id_akun = ? ORDER BY id ASC");
+                            if ($stmt === false) {
+                                die("Persiapan pernyataan gagal: " . mysqli_error($conn));
+                            }
+
+                            mysqli_stmt_bind_param($stmt, "i", $_SESSION['id']);
+                            mysqli_stmt_execute($stmt);
+                            $result = mysqli_stmt_get_result($stmt);
+
+                            if (mysqli_num_rows($result) > 0) {
+                                $index = 0;
+                                while ($r = mysqli_fetch_array($result)) {
+                                    $index++;
+                                    $id_transaksi = $r['id'];
+                                    $kategori = $r['kategori'];
+                                    $keterangan = $r['keterangan'];
+                                    $pemasukan = $r['pemasukan'];
+                                    $pengeluaran = $r['pengeluaran'];
                         ?>
-                            <tr>
-                                <th scope="row">
-                                    <?php echo $id_transaksi ?>
-                                </th>
-                                <td scope="row">
-                                    <?php echo $kategori ?>
-                                </td>
-                                <td scope="row">
-                                    <?php echo $keterangan ?>
-                                </td>
-                                <td scope="row">
-                                    <?php echo $pemasukan ?>
-                                </td>
-                                <td scope="row">
-                                    <?php echo $pengeluaran ?>
-                                </td>
-                                <td scope="row">
-                                    <a href="index.php?op=edit&id=<?php echo $id_transaksi ?>">
-                                        <button type="button" class="btn btn-warning">Edit</button>
-                                    </a>
-                                    <a href="index.php?op=delete&id=<?php echo $id_transaksi ?>" onclick="return confirm('Apakah anda yakin untuk menghapus item ini?')">
-                                        <button type="button" class="btn btn-danger">Delete</button>
-                                    </a>
-                                </td>
-                            </tr>
+                                    <tr>
+                                        <th scope="row">
+                                            <?php echo $index ?>
+                                        </th>
+                                        <td scope="row">
+                                            <?php echo $kategori ?>
+                                        </td>
+                                        <td scope="row">
+                                            <?php echo $keterangan ?>
+                                        </td>
+                                        <td scope="row">
+                                            <?php echo $pemasukan ?>
+                                        </td>
+                                        <td scope="row">
+                                            <?php echo $pengeluaran ?>
+                                        </td>
+                                        <td scope="row">
+                                            <a href="index.php?op=edit&id=<?php echo $id_transaksi ?>">
+                                                <button type="button" class="btn btn-warning">Edit</button>
+                                            </a>
+                                            <a href="index.php?op=delete&id=<?php echo $id_transaksi ?>" onclick="return confirm('Apakah anda yakin untuk menghapus item ini?')">
+                                                <button type="button" class="btn btn-danger">Delete</button>
+                                            </a>
+                                        </td>
+                                    </tr>
                         <?php
-                        }
+                                }
+                            } else {
+                        ?>
+                                <tr>
+                                    <td colspan="6" class="text-center">Tidak ada data</td>
+                                </tr>
+                        <?php
+                            }
+                            mysqli_stmt_close($stmt);
                         ?>
                     </tbody>
-                    </thead>
                 </table>
                 <a href="logout.php" onclick="return confirm('Apakah anda ingin logout?')">
                     <button type="button" class="btn btn-danger">Log out</button>

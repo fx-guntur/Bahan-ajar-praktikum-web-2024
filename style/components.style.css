@@ -29,6 +29,7 @@
 
 .input-group input:focus {
     border: 1px solid hsl(var(--primary));
+    outline: 2px solid hsl(var(--primary));
 }
 
 .input-group input::placeholder {
@@ -61,7 +62,7 @@
     border-radius: 0.8rem;
     cursor: pointer;
   }
-  
+
   .btn-secondary:hover {
     background-color: hsla(var(--secondary), 0.8);
     box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
@@ -70,21 +71,21 @@
   .link {
     color: hsl(var(--primary-foreground));
   }
-  
+
   .link-primary {
     color: hsl(var(--primary));
   }
-  
+
   .link,
   .link-primary {
     text-decoration: underline;
   }
-  
+
   .link:hover,
   .link-primary:hover {
     text-decoration: none;
   }
-  
+
   .text-center {
     text-align: center;
   }

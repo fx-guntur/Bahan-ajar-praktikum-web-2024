@@ -10,6 +10,10 @@ if (!$conn) {
     die("Tidak bisa terkoneksi ke database");
 }
 
+if(!@$_SESSION) {
+    session_start();
+}
+
 $kategori = "";
 $keterangan = "";
 $jumlah = "";
@@ -109,24 +113,33 @@ if (isset($_POST['simpan'])) {
 if (isset($_POST["register"])) {
     // Simpan data dari post register ke variabel lokal
     $username = stripslashes($_POST['name']); // membuat username menjadi lowercase sebelum di simpan ke database
-    $sanitized_pass = mysqli_real_escape_string($conn, $_POST['password']); // mencegah un-authorized login
-    $sanitized_conf_pass = mysqli_real_escape_string($conn, $_POST['password-confirmation']);
+    $pass = $_POST['password']; // mencegah un-authorized login
+    $conf_pass = $_POST['password-confirmation'];
     $email = $_POST['email'];
 
-    if ($username && $sanitized_pass && $sanitized_conf_pass) {
+    if ($username && $pass && $conf_pass) {
         // mengecek apakah ada user dengan username yang sama
-        $result = mysqli_query($conn, "SELECT username FROM user WHERE username = '$username'");
+        $stmt = mysqli_prepare($conn, "SELECT username FROM user WHERE username = ?");
+        if ($stmt === false) {
+            die("Persiapan pernyataan gagal: " . mysqli_error($conn));
+        }
+        mysqli_stmt_bind_param($stmt, "s", $username);
+        mysqli_stmt_execute($stmt);
+        $result = mysqli_stmt_get_result($stmt);
 
-        if (mysqli_fetch_assoc($result)) {
+        if (mysqli_num_rows($result) > 0) {
             echo "<script>
                 alert('username sudah terdaftar!')
             </script>";
+            mysqli_stmt_close($stmt);
+            mysqli_close($conn);
             return false;
         }
 
+        mysqli_stmt_close($stmt);
 
         // cek konfirmasi password
-        if ($sanitized_pass !== $sanitized_conf_pass) {
+        if ($pass !== $conf_pass) {
             echo "<script>
                 alert('konfirmasi password tidak sesuai!');
             </script>";
@@ -134,16 +147,16 @@ if (isset($_POST["register"])) {
         }
 
         // hashing password
-        $sanitized_pass = password_hash($sanitized_pass, PASSWORD_DEFAULT);
+        $pass = password_hash($pass, PASSWORD_DEFAULT);
 
         // tambahkan userbaru ke database
+        $stmt = mysqli_prepare($conn, "INSERT INTO user (username, email, password) VALUES (?, ?, ?)");
+        if ($stmt === false) {
+            die("Persiapan pernyataan gagal: " . mysqli_error($conn));
+        }
 
-        $sql = "INSERT INTO user (username, email, password) 
-                VALUES ('" . $username . "', 
-                '" . $email . "', 
-                '" . $sanitized_pass . "')";
-
-        $sql_result = mysqli_query($conn, $sql) or die(mysqli_error($db));
+        mysqli_stmt_bind_param($stmt, "sss", $username, $email, $pass);
+        $sql_result = mysqli_stmt_execute($stmt);
 
         if ($sql_result) {
             header("refresh:0;url=signin.php");
@@ -155,6 +168,8 @@ if (isset($_POST["register"])) {
                 alert('Registrasi gagal!')
             </script>";
         }
+        mysqli_stmt_close($stmt);
+        mysqli_close($conn);
     } else {
         echo "<script>
                 alert('Input semua data!')
@@ -166,19 +181,21 @@ if (isset($_POST["login"])) {
     $email = $_POST["email"];
     $password = $_POST["password"];
 
-    $sanitized_pass = mysqli_real_escape_string($conn, $password); // mencegah un-authorized login
+    if ($email && $password) {
+        $stmt = mysqli_prepare($conn, "SELECT * FROM user WHERE email = ?");
+        if ($stmt === false) {
+            die("Persiapan pernyataan gagal: " . mysqli_error($conn));
+        }
+        mysqli_stmt_bind_param($stmt, "s", $email);
+        mysqli_stmt_execute($stmt);
+        $result = mysqli_stmt_get_result($stmt);
 
-    if ($email && $sanitized_pass) {
-
-        $sql = mysqli_query($conn, "SELECT * FROM user WHERE email = '"
-            . $email . "'");
-
-        if (mysqli_num_rows($sql) === 1) {
+        if (mysqli_num_rows($result) > 0) {
             // menyimpan array data yang di dapatkan dari query $sql ke variabel $row
-            $row = mysqli_fetch_assoc($sql);
-            if (password_verify($sanitized_pass, $row["password"])) {
+            $row = mysqli_fetch_assoc($result);
+            if (password_verify($password, $row["password"])) {
                 // set session
-                $_SESSION["login"] = true;
+                $_SESSION["login"] = True;
                 $_SESSION["id"] = $row["id"];
                 echo "<script>
                     alert('Login berhasil')
@@ -196,5 +213,7 @@ if (isset($_POST["login"])) {
                 alert('Input semua data!')
             </script>";
         }
+        mysqli_stmt_close($stmt);
+        mysqli_close($conn);
     }
 }
