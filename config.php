@@ -42,6 +42,7 @@ if ($op == 'delete') {
 
 if ($op == 'edit') {
     $id_transaksi = $_GET['id'];
+    // TODO: Ubah menjadi prepared statement
     $sql1 = "SELECT * FROM tabel_keuangan where id = '$id_transaksi'";
     $q1 = mysqli_query($conn, $sql1); // Mejalankan query
     $r1 = mysqli_fetch_array($q1); // Memasukkan hasil query ke array r1
@@ -71,6 +72,7 @@ if (isset($_POST['simpan'])) {
 
     if ($kategori && $keterangan && $tipe && $jumlah) {
         if ($op == 'edit') {
+            // TODO: Ubah menjadi prepared statement
             $sql1 = "SELECT * FROM tabel_keuangan where id = '$id_transaksi'";
             $q1 = mysqli_query($conn, $sql1);
             $r1 = mysqli_fetch_array($q1);
@@ -96,9 +98,15 @@ if (isset($_POST['simpan'])) {
                 $pengeluaran = $jumlah;
                 $pemasukan = 0;
             }
-            $sqli = "INSERT INTO tabel_keuangan(kategori, pemasukan, pengeluaran, keterangan) VALUES('$kategori','$pemasukan','$pengeluaran', '$keterangan')";
-            $q1 = mysqli_query($conn, $sqli);
-            if ($q1) {
+            $stmt = mysqli_prepare($conn, "INSERT INTO tabel_keuangan(kategori, pemasukan, pengeluaran, keterangan, id_akun) VALUES (?, ?, ?, ?, ?)");
+            if ($stmt === false) {
+                die("Persiapan pernyataan gagal: " . mysqli_error($conn));
+            }
+
+            mysqli_stmt_bind_param($stmt, "siisi", $kategori, $pemasukan, $pengeluaran, $keterangan, $_SESSION['id']);
+            $sql_result = mysqli_stmt_execute($stmt);
+
+            if ($sql_result) {
                 $sukses = "Berhasil memasukkan data baru";
             } else {
                 $error = "Gagal memasukkan data";
